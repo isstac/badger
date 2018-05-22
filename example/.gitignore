@@ -1,0 +1,12 @@
+import-statistic.txt
+generation-statistic.txt
+export-statistic.txt
+trie-statistic.txt
+pcMap.txt
+*.dot
+*.pdf
+/tmp
+/symexe_analysis
+/kelinciwca_analysis/bin
+/kelinciwca_analysis/fuzzer-out
+/kelinciwca_analysis/src
