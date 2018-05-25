@@ -1,0 +1,38 @@
+inputDir=./kelinci_analysis/fuzzer-out/afl/queue
+exportDir=./kelinci_analysis/fuzzer-out/spf/queue
+tmpDir=./tmp
+classpath=./spf_analysis/bin
+
+target=Regex
+
+symbolic.method=regexjdk8.Pattern.matches(con#con)
+symbolic.dp=z3bitvector
+
+cycleWaitingSec=600
+secUntilFirstCycle=60
+
+analysis.method=wca
+analysis.wca.metric=jumps
+analysis.wca.selection.heuristic=highest-score-highest-node
+
+io.utils=char-byte-array
+
+# Regex is fixed and we mutate the text:
+#argument=./kelinci_analysis/resources-byte/popular-regexes/2password-byte @@
+#io.array.size=100
+
+# Text is fixed and we mutate the regex:
+argument=./kelinci_analysis/resources-byte/lorem-byte.txt @@
+io.array.size=10
+
+numberOfAdditionalDecisions=0
+maximumNumberOfNodesExploredPerRun=10
+initialId=0
+
+import.statistics.file=import-statistics.txt
+generation.statistics.file=generation-statistics.txt
+export.statistics.file=export-statistics.txt
+pc.mapping.file=pcMap.txt
+trie.statistics.file=trie-statistics.txt
+
+debug.print=false
