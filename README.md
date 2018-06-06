@@ -15,7 +15,8 @@ In order to run Badger you need basically two things: (1) a fuzzer, and (2) a sy
 As fuzzer we use in our apporach the KelinciWCA, which is provided in its own [repository](https://github.com/isstac/kelinci/tree/7155d4bf383fee21e8024a8ba4cba799aeaeb620).
 The symbolic execution engine (denoted as SymExe) is delivered with this repository.
 It is built on top of Java PathFinder (JPF) and Symbolic PathFinder (SPF), which makes it necessary to have the projects jpf-core and jpf-symbc ready and built.
-Therefore, please be sure to have the following ".jpf/site.properties" in your home directory:
+We recommend using the latest SPF version from their GitHub [repository](https://github.com/SymbolicPathFinder/jpf-symbc/tree/b64ab6a0c8dde218b34969b46ee526ece7ddee44) and, for now, our own branch of the JPF [repository](https://github.com/nolleryc/jpf-core/tree/0f2f2901cd0ae9833145c38fee57be03da90a64f).
+Please be sure to have the following ".jpf/site.properties" in your home directory:
 ```
 # JPF site configuration
 jpf-core = ${user.home}/.../path-to-jpf-core-folder/jpf-core
