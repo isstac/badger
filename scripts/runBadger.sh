@@ -1,13 +1,13 @@
 ### Define here local variables #####
 #####################################
-# chmod +x run_experiments.sh
+# chmod +x runBadger.sh
 # ./runBadger.sh
 #
 
 trap "exit" INT
 
-# time bound for each run (in hours):
-time_bound=18000 #18000 # = 5 hours
+# time bound for each run (in seconds):
+time_bound=18000 # 18000 = 5 hours
 
 # number of experiments
 number_of_runs=1 #5
