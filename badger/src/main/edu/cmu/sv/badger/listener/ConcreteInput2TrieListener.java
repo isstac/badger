@@ -153,7 +153,8 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
                     cost = 0.0;
                 }
 
-                TrieNode n = new TrieNode(trie, choice, offset, method, lineNumber, cur, currentInstruction, pc, cost, Observations.lastObservedInputSize);
+                TrieNode n = new TrieNode(trie, choice, offset, method, lineNumber, cur, currentInstruction, pc, cost,
+                        Observations.lastObservedInputSize);
                 if (trie.addObservedChoice(currentInstruction, choice)) {
                     exposedNewBranch = true;
                 }
@@ -193,7 +194,8 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
             if (cur.getChildren().isEmpty()) {
                 cur.setType(TrieNodeType.LEAF_NODE);
                 observedFinalCost = cur.getMetricValue();
-                if (observedFinalCost != null && (trie.getCostStrategy().equals(CostStrategy.MAXIMIZE) ? observedFinalCost > trie.currentBestCostValue
+                if (observedFinalCost != null && (trie.getCostStrategy().equals(CostStrategy.MAXIMIZE)
+                        ? observedFinalCost > trie.currentBestCostValue
                         : observedFinalCost < trie.currentBestCostValue)) {
                     trie.currentBestCostValue = observedFinalCost;
                     observedBetterScore = true;
@@ -210,9 +212,14 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
                     newMetricValueForParent = cur.getMetricValue();
                 } else {
                     // if there are other children, then update the average
-                    Double oldMetricValueForParent = cur.getParent().getMetricValue();
-                    newMetricValueForParent = oldMetricValueForParent
-                            + (cur.getMetricValue() - oldMetricValueForParent) / numberOfChildren;
+                    // Double oldMetricValueForParent = cur.getParent().getMetricValue();
+                    // newMetricValueForParent = oldMetricValueForParent
+                    // + (cur.getMetricValue() - oldMetricValueForParent) / numberOfChildren;
+                    Double sum = 0.0;
+                    for (TrieNode child : cur.getParent().getChildren()) {
+                        sum += child.getMetricValue();
+                    }
+                    newMetricValueForParent = sum / numberOfChildren;
                 }
                 cur.getParent().updateMetricValue(newMetricValueForParent);
             }
