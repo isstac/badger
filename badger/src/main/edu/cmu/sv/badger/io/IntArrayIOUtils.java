@@ -10,6 +10,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 
+/*! problems with negative integers*/
 public class IntArrayIOUtils extends IOUtils {
 
     public static final String ID = "int-byte-array";

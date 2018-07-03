@@ -69,10 +69,10 @@ public class SymExe {
             List<String> newInputfiles;
             if (firstStep) {
                 firstStep = false;
-                newInputfiles = analyzeInputFiles(input.intialInputDir);
+                newInputfiles = analyzeInputFiles(input.initialInputDir);
             } else {
                 newInputfiles = analyzeInputFiles(
-                        input.syncInputdir.isPresent() ? input.syncInputdir.get() : input.intialInputDir);
+                        input.syncInputdir.isPresent() ? input.syncInputdir.get() : input.initialInputDir);
             }
 
             // Run one step.

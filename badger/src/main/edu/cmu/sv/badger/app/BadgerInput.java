@@ -39,7 +39,7 @@ import edu.cmu.sv.badger.io.MultipleIntArrayIOUtils;
 public class BadgerInput {
 
     /* Directories */
-    public String intialInputDir;
+    public String initialInputDir;
     public Optional<String> syncInputdir;
     public String exportDir;
     public String tmpDir;
@@ -99,7 +99,7 @@ public class BadgerInput {
         }
 
         /* Directories */
-        this.intialInputDir = prop.getProperty(BadgerInputKeys.INITIAL_INPUT_DIR.name);
+        this.initialInputDir = prop.getProperty(BadgerInputKeys.INITIAL_INPUT_DIR.name);
         this.syncInputdir = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYNC_INPUT_DIR.name));
         this.exportDir = prop.getProperty(BadgerInputKeys.EXPORT_DIR.name);
         this.tmpDir = prop.getProperty(BadgerInputKeys.TMP_DIR.name, "./tmp");
