@@ -215,11 +215,23 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
                     // Double oldMetricValueForParent = cur.getParent().getMetricValue();
                     // newMetricValueForParent = oldMetricValueForParent
                     // + (cur.getMetricValue() - oldMetricValueForParent) / numberOfChildren;
-                    Double sum = 0.0;
+                    double sum = 0.0;
+                    int numberOfSATChildren = 0;
                     for (TrieNode child : cur.getParent().getChildren()) {
+                        
+                        /* Skip unsat nodes because they do not have a metric value. */
+                        if (child.getType().equals(TrieNodeType.UNSAT_NODE)) {
+                            continue;
+                        }
+                        
+                        if (child.getMetricValue() == null) {
+                            System.out.println();
+                        }
+
                         sum += child.getMetricValue();
+                        numberOfSATChildren++;
                     }
-                    newMetricValueForParent = sum / numberOfChildren;
+                    newMetricValueForParent = sum / numberOfSATChildren;
                 }
                 cur.getParent().updateMetricValue(newMetricValueForParent);
             }
