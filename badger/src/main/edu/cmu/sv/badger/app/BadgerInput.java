@@ -13,7 +13,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import edu.cmu.sv.badger.analysis.BranchCountState;
 import edu.cmu.sv.badger.analysis.CoverageAnalyzer;
+import edu.cmu.sv.badger.analysis.CoverageExplorationHeuristic;
 import edu.cmu.sv.badger.analysis.ExplorationHeuristic;
+import edu.cmu.sv.badger.analysis.WCAExplorationHeuristic;
 import edu.cmu.sv.badger.analysis.InstructionCountState;
 import edu.cmu.sv.badger.analysis.StateBuilderFactory;
 import edu.cmu.sv.badger.analysis.TrieAnalyzer;
@@ -154,26 +156,33 @@ public class BadgerInput {
 
         switch (analysisMethod) {
         case WCAAnalyzer.ID:
-            this.trieAnalysisMethod = new WCAAnalyzer();
-            if (selectedExplorationHeuristic.equals(ExplorationHeuristic.HIGHEST_COST_HIGHEST_NODE.ID)) {
-                this.explorationHeuristic = ExplorationHeuristic.HIGHEST_COST_HIGHEST_NODE;
-            } else if (selectedExplorationHeuristic.equals(ExplorationHeuristic.HIGHEST_COST_LOWEST_NODE.ID)) {
-                this.explorationHeuristic = ExplorationHeuristic.HIGHEST_COST_LOWEST_NODE;
-            } else if (selectedExplorationHeuristic.equals(ExplorationHeuristic.LOWEST_COST_HIGHEST_NODE.ID)) {
-                this.explorationHeuristic = ExplorationHeuristic.LOWEST_COST_HIGHEST_NODE;
-            } else if (selectedExplorationHeuristic.equals(ExplorationHeuristic.LOWEST_COST_LOWEST_NODE.ID)) {
-                this.explorationHeuristic = ExplorationHeuristic.LOWEST_COST_LOWEST_NODE;
+            if (selectedExplorationHeuristic.equals(WCAExplorationHeuristic.HIGHEST_COST_HIGHEST_NODE.ID)) {
+                explorationHeuristic = WCAExplorationHeuristic.HIGHEST_COST_HIGHEST_NODE;
+            } else if (selectedExplorationHeuristic.equals(WCAExplorationHeuristic.HIGHEST_COST_LOWEST_NODE.ID)) {
+                explorationHeuristic = WCAExplorationHeuristic.HIGHEST_COST_LOWEST_NODE;
+            } else if (selectedExplorationHeuristic.equals(WCAExplorationHeuristic.LOWEST_COST_HIGHEST_NODE.ID)) {
+                explorationHeuristic = WCAExplorationHeuristic.LOWEST_COST_HIGHEST_NODE;
+            } else if (selectedExplorationHeuristic.equals(WCAExplorationHeuristic.LOWEST_COST_LOWEST_NODE.ID)) {
+                explorationHeuristic = WCAExplorationHeuristic.LOWEST_COST_LOWEST_NODE;
             } else {
                 throw new RuntimeException("Unknown value for " + BadgerInputKeys.ANALYSIS_EXPLORATION_HEURISTIC.name
-                        + ": " + selectedExplorationHeuristic);
+                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitalble "
+                        + WCAAnalyzer.ID + " heuristic.");
             }
+            this.trieAnalysisMethod = new WCAAnalyzer(explorationHeuristic);
             break;
         case CoverageAnalyzer.ID:
-            this.trieAnalysisMethod = new CoverageAnalyzer();
-            throw new RuntimeException(
-                    BadgerInputKeys.ANALYSIS_METHOD.name + "= " + CoverageAnalyzer.ID + " is not implemented yet!");
-            /* TODO branch coverage, path coverage, ... */
-            // break;
+            if (selectedExplorationHeuristic.equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE.ID)) {
+                explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE;
+            } else if (selectedExplorationHeuristic.equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL.ID)) {
+                explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL;
+            } else {
+                throw new RuntimeException("Unknown value for " + BadgerInputKeys.ANALYSIS_EXPLORATION_HEURISTIC.name
+                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitalble "
+                        + CoverageAnalyzer.ID + " heuristic.");
+            }
+            this.trieAnalysisMethod = new CoverageAnalyzer(explorationHeuristic);
+            break;
         default:
             throw new RuntimeException(
                     "Unknown value for " + BadgerInputKeys.ANALYSIS_METHOD.name + ": " + analysisMethod);
@@ -218,7 +227,7 @@ public class BadgerInput {
         String inputSizesString = prop.getProperty(BadgerInputKeys.IO_INPUT_SIZES.name);
         String[] inputSizesStringSplitted = inputSizesString.split(" ");
         this.inputSizes = new Integer[inputSizesStringSplitted.length];
-        for (int i=0; i<inputSizes.length; i++) {
+        for (int i = 0; i < inputSizes.length; i++) {
             try {
                 this.inputSizes[i] = NumberUtils.createInteger(inputSizesStringSplitted[i]);
             } catch (NumberFormatException e) {
@@ -234,49 +243,57 @@ public class BadgerInput {
             break;
         case IntArrayIOUtils.ID:
             if (inputSizes.length != 1) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + IntArrayIOUtils.ID + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + IntArrayIOUtils.ID
+                        + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new IntArrayIOUtils(inputSizes[0]);
             break;
         case CharArrayIOUtils.ID:
             if (inputSizes.length != 1) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + CharArrayIOUtils.ID + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + CharArrayIOUtils.ID
+                        + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new CharArrayIOUtils(inputSizes[0]);
             break;
         case CharArrayIOUtilsEngagement.ID:
             if (inputSizes.length != 1) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + CharArrayIOUtilsEngagement.ID + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + CharArrayIOUtilsEngagement.ID
+                        + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new CharArrayIOUtilsEngagement(inputSizes[0]);
             break;
         case ByteTextIOUtils.ID:
             if (inputSizes.length != 2) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + ByteTextIOUtils.ID + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + ByteTextIOUtils.ID
+                        + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new ByteTextIOUtils(inputSizes[0], inputSizes[1]);
             break;
         case FullIntArrayIOUtils.ID:
             if (inputSizes.length != 1) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + FullIntArrayIOUtils.ID + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + FullIntArrayIOUtils.ID
+                        + " needs one value definition for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new FullIntArrayIOUtils(inputSizes[0]);
             break;
         case DynamicIntArrayIOUtils.ID:
             if (inputSizes.length != 2) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + DynamicIntArrayIOUtils.ID + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + DynamicIntArrayIOUtils.ID
+                        + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new DynamicIntArrayIOUtils(inputSizes[0], inputSizes[1]);
             break;
         case MultipleIntArrayIOUtils.ID:
             if (inputSizes.length != 2) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + MultipleIntArrayIOUtils.ID + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + MultipleIntArrayIOUtils.ID
+                        + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new MultipleIntArrayIOUtils(inputSizes[0], inputSizes[1]);
             break;
         case DynamicCharArrayIOUtils.ID:
             if (inputSizes.length != 2) {
-                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + DynamicCharArrayIOUtils.ID + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + DynamicCharArrayIOUtils.ID
+                        + " needs two value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
             }
             this.ioUtils = new DynamicCharArrayIOUtils(inputSizes[0], inputSizes[1]);
             break;
@@ -299,7 +316,8 @@ public class BadgerInput {
                 "export-statistic.txt");
         this.trieStatisticsFile = prop.getProperty(BadgerInputKeys.INTERNAL_TRIE_STATISTICS_FILE.name,
                 "trie-statistic.txt");
-        this.printStatistics = Boolean.valueOf(prop.getProperty(BadgerInputKeys.PRINT_PC_INFO.name, String.valueOf(this.printStatistics)));
+        this.printStatistics = Boolean
+                .valueOf(prop.getProperty(BadgerInputKeys.PRINT_PC_INFO.name, String.valueOf(this.printStatistics)));
         this.pcMappingFile = prop.getProperty(BadgerInputKeys.PC_MAPPING_FILE.name, "pcMap.txt");
 
         /* Print Trie As Dot Files */

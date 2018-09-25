@@ -35,9 +35,6 @@ import gov.nasa.jpf.vm.VM;
 /**
  * @author Kasper Luckow
  * 
- * TODO:This is starting to look more and more like propertylisteneradapter
- * Maybe this class should just subclass it and in some way be added as
- * a listener similar to e.g. PathListener.
  */
 public interface StateBuilder {
   public StateBuilder copy();

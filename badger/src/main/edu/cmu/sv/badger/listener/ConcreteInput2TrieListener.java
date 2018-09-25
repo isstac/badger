@@ -1,8 +1,9 @@
 package edu.cmu.sv.badger.listener;
 
 import edu.cmu.sv.badger.analysis.StateBuilder;
+import edu.cmu.sv.badger.analysis.WCAAnalyzer;
+import edu.cmu.sv.badger.analysis.WCAAnalyzer.CostStrategy;
 import edu.cmu.sv.badger.trie.Trie;
-import edu.cmu.sv.badger.trie.Trie.CostStrategy;
 import edu.cmu.sv.badger.trie.TrieNode;
 import edu.cmu.sv.badger.trie.TrieNodeType;
 import gov.nasa.jpf.Config;
@@ -23,7 +24,7 @@ import gov.nasa.jpf.vm.ThreadChoiceGenerator;
  * @author Yannic Noller <nolleryc@gmail.com> - YN
  */
 
-public class ConcreteInput2TrieListener extends ListenerAdapter {
+public class ConcreteInput2TrieListener extends ListenerAdapter implements IBehavior {
     Trie trie;
     TrieNode cur;
 
@@ -62,10 +63,12 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
         return this.observedFinalCost;
     }
 
+    @Override
     public boolean didObserveBetterScore() { // can be highscore or lowscore depends on cost target
         return this.observedBetterScore;
     }
 
+    @Override
     public boolean didExposeNewBranch() {
         return this.exposedNewBranch;
     }
@@ -155,7 +158,7 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
 
                 TrieNode n = new TrieNode(trie, choice, offset, method, lineNumber, cur, currentInstruction, pc, cost,
                         Observations.lastObservedInputSize);
-                if (trie.addObservedChoice(currentInstruction, choice)) {
+                if (trie.getAnalyzer().addObservedChoice(currentInstruction, choice)) {
                     exposedNewBranch = true;
                 }
 
@@ -194,13 +197,15 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
             if (cur.getChildren().isEmpty()) {
                 cur.setType(TrieNodeType.LEAF_NODE);
                 observedFinalCost = cur.getMetricValue();
-                if (observedFinalCost != null && (trie.getCostStrategy().equals(CostStrategy.MAXIMIZE)
-                        ? observedFinalCost > trie.currentBestCostValue
-                        : observedFinalCost < trie.currentBestCostValue)) {
-                    trie.currentBestCostValue = observedFinalCost;
-                    observedBetterScore = true;
+                if (trie.getAnalyzer() instanceof WCAAnalyzer) {
+                    WCAAnalyzer analyzer = (WCAAnalyzer) trie.getAnalyzer();
+                    if (observedFinalCost != null && (analyzer.getCostStrategy().equals(CostStrategy.MAXIMIZE)
+                            ? observedFinalCost > analyzer.currentBestCostValue
+                            : observedFinalCost < analyzer.currentBestCostValue)) {
+                        analyzer.currentBestCostValue = observedFinalCost;
+                        observedBetterScore = true;
+                    }
                 }
-
             }
 
             /* Backpropagate metric value */
@@ -225,7 +230,8 @@ public class ConcreteInput2TrieListener extends ListenerAdapter {
                         }
                         
                         if (child.getMetricValue() == null) {
-                            System.out.println();
+                            continue;
+                            // TODO execution probably ended up in exception..
                         }
 
                         sum += child.getMetricValue();

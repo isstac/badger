@@ -237,7 +237,7 @@ public class TrieNode implements Serializable {
 
         // update position in trie priority queue by adding it to the queue (if
         // required)
-        trie.updateNodeInPriorityQueue(this);
+        trie.updateNode(this);
     }
 
     public Double getMetricValue() {
@@ -261,7 +261,7 @@ public class TrieNode implements Serializable {
 
         // Check branch coverage for the instruction associated to this node.
         if (!this.getChildren().isEmpty()) {
-            if (this.trie.getObservedChoices(nextInstructionHashCode).size() >= this.getMaximumNumberOfChildren()) {
+            if (this.trie.getAnalyzer().getObservedChoices(nextInstructionHashCode).size() >= this.getMaximumNumberOfChildren()) {
                 return false;
             }
         } else {

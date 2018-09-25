@@ -15,7 +15,6 @@ import edu.cmu.sv.badger.listener.MetricListener;
 import edu.cmu.sv.badger.listener.SymCreteCostListener;
 import edu.cmu.sv.badger.listener.TrieGuidanceListener;
 import edu.cmu.sv.badger.trie.Trie;
-import edu.cmu.sv.badger.trie.Trie.CostStrategy;
 import edu.cmu.sv.badger.trie.TrieNode;
 import edu.cmu.sv.badger.util.Statistics;
 import gov.nasa.jpf.Config;
@@ -48,7 +47,7 @@ public class SymExe {
 
     public SymExe(BadgerInput input) {
         this.input = input;
-        this.trie = new Trie(input.explorationHeuristic);
+        this.trie = new Trie(input.trieAnalysisMethod);
         lastId.set(input.initialId);
         this.pcAndSolutionQueue = new ArrayBlockingQueue<>(1000);
     }
@@ -96,7 +95,7 @@ public class SymExe {
      */
     private boolean runStep(List<String> newInputFiles) {
 
-        if (newInputFiles.isEmpty() && trie.isPriorityQueueEmpty()) {
+        if (newInputFiles.isEmpty() && !input.trieAnalysisMethod.isNodeLeftforAnalysis()) {
             // If there is no new input (from fuzzer), and we assume that our last run was complete, then
             // here is no need to further analyze or process the trie, because there is no path left to find.
             System.out.println("[SPF] nothing to process, wait for " + input.cycleWaitingSec + " sec ...");
@@ -118,7 +117,7 @@ public class SymExe {
          */
         for (int i = 0; i < input.maximumNumberOfSymExeIterations; i++) {
 
-            // Analyze trie.
+            // Analyze trie: pick next node and mark path in trie for efficient replay.
             TrieNode identifiedNode = input.trieAnalysisMethod.analyze(trie);
 
             if (input.printTrieAsDot) {
@@ -254,7 +253,8 @@ public class SymExe {
             }
 
             if (spfMode.equals(ConcreteSPFMode.EXPORT)) {
-                if (trieListener.didExposeNewBranch() || trieListener.didObserveBetterScore()) {
+
+                if (input.explorationHeuristic.didObserveNewBehavior(trieListener)) {
                     String outputfile = input.exportDir + "/id:" + String.format("%06d", lastId.incrementAndGet());
 
                     File tmpFile = new File(originalFileName);
@@ -264,8 +264,7 @@ public class SymExe {
                     String statistics = (System.currentTimeMillis() / 1000L) + "," + originalFileName + "," + outputfile
                             + (trieListener.didExposeNewBranch() ? ",branch" : "")
                             + (trieListener.didObserveBetterScore()
-                                    ? (trie.getCostStrategy().equals(CostStrategy.MAXIMIZE) ? ",highscore"
-                                            : ",lowscore") + "," + trieListener.getObservedCostForLeafNode()
+                                    ? ",score," + trieListener.getObservedCostForLeafNode()
                                     : "")
                             + "\n";
                     Statistics.appendExportStatistics(input, statistics);
@@ -274,10 +273,7 @@ public class SymExe {
             if (spfMode.equals(ConcreteSPFMode.IMPORT)) {
                 String statistic = (System.currentTimeMillis() / 1000L) + "," + originalFileName + ","
                         + trieListener.getObservedCostForLeafNode()
-                        + (trieListener.didObserveBetterScore()
-                                ? (trie.getCostStrategy().equals(CostStrategy.MAXIMIZE) ? ",highscore" : ",lowscore")
-                                : "")
-                        + "\n";
+                        + (trieListener.didObserveBetterScore() ? ",score" : "") + "\n";
                 Statistics.appendImportStatistics(input, statistic);
             }
 
@@ -427,7 +423,7 @@ public class SymExe {
                 String processedFileName = inputEntry.getValue().replaceAll(",", "#");
 
                 // If the optimization parameter is enabled, then first try to optimize the current file. This makes
-                // only sense if we use a user-defined cost metric.
+                // only sense if we use a user-defined cost metric because only there we might have a
                 if (input.spf_dp.endsWith("optimize") && input.useUserDefinedCost) {
 
                     // Make a dry (without changing anything from the trie).
