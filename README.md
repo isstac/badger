@@ -2,7 +2,7 @@
 
 Badger means the combination of fuzzing and symbolic execution for complexity analysis. 
 This approach uses the strength and scalability of fuzzing and the precision of symbolic execution.
-Please have a look at our [paper](https://conf.researchr.org/event/issta-2018/issta-2018-technical-papers-badger-complexity-analysis-with-fuzzing-and-symbolic-execution) for more information about our approach.
+Please have a look at our [paper](https://dl.acm.org/citation.cfm?id=3213868) for more information about our approach.
 This repository contains the source code for the symbolic execution part of Badger (denoted as *SymExe*), which could be also run in separate.
 
 ## Getting Started
@@ -92,10 +92,9 @@ Badger needs a configuration property file as parameter. The following table sho
 | symbolic.min_char    | Minimum value of symbolic chars. | no |
 | symbolic.max_byte    | Maximum value of symbolic bytes. | no |
 | symbolic.min_byte    | Minimum value of symbolic bytes. | no |
-| analysis.method      | Analysis method for trie exploration: "wca" or "cov". Coverage is currently not supported! | yes |
-| analysis.heuristic   | Trie exploration heuristic. For "wca": "highest-cost-highest-node". "highest-cost-lowest-node", "lowest-cost-highest-node", "lowest-cost-highest-node". | yes |
+| analysis.method      | Analysis method for trie exploration: "wca" or "cov". | yes |
+| analysis.heuristic   | Trie exploration heuristic. For "wca": "highest-cost-highest-node". "highest-cost-lowest-node", "lowest-cost-highest-node", "lowest-cost-highest-node". For "cov": "branch". | yes |
 | analysis.wca.metric  | Cost metric: "jumps", "instructions", "userdefined" (necessary for "wca"). | no |
-| analysis.cov.metric  | <Not Supported Yet> | no |
 | io.utils             | Input Generator. Please check source package "edu.cmu.sv.badger.io" for current implementations or add your own. | yes |
 | io.input.sizes       | Abstract input size(s) for input generation, separated by spaces. | yes |
 | io.initial.id        | Initial id for generated input file. Default: "0" | no |
@@ -175,7 +174,7 @@ You might need to change some folder paths in the script.
 
 ## Developers
 
-* **Yannic Noller** (nolleryc@gmail.com)
+* **Yannic Noller** (yannic.noller at acm.org)
 
 
 ## License
