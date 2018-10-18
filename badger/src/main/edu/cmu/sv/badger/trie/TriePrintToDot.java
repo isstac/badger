@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Help class to print a trie to a dot graph
@@ -19,7 +21,7 @@ import java.io.Writer;
 
 public class TriePrintToDot {
     Trie trie;
-    
+
     private static boolean printInputSizeInfo = false;
 
     public TriePrintToDot() {
@@ -56,8 +58,7 @@ public class TriePrintToDot {
         try {
             output.write("digraph \"\" { \n");
             if (null != trie.getRoot()) {
-                printTrieNodes(trie.getRoot(), output);
-                printTrieEdges(trie.getRoot(), output);
+                printTrieNodesAndEdges(trie.getRoot(), output);
             }
             output.write("}");
         } catch (IOException e) {
@@ -72,116 +73,114 @@ public class TriePrintToDot {
         }
     }
 
-    public void printTrieNodes(TrieNode node, Writer output) throws IOException {
-
+    private String generateNodeStringRepresentation(TrieNode node) {
+        String stringRepresentation = "";
         if (node.needsExploration()) {
             if (node.getOffset() == -1) {// root node
-                output.write(node.hashCode() + "[ color=\"lightblue\" style=\"filled\" fillcolor=\"green\" label=\"id="
+                stringRepresentation = (node.hashCode()
+                        + "[ color=\"lightblue\" style=\"filled\" fillcolor=\"green\" label=\"id=" + node.getId()
+                        + ", Root, #choices="
+                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
+                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
+                        + ", \n newBranches=" + node.canExposeNewBranches()
+                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
+            } else {
+                stringRepresentation = (node.hashCode() + "[ color=\"green\" style=\"filled\" label=\"" + "id="
+                        + node.getId() + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset="
+                        + node.getOffset() + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode()
+                        + ", #choices="
+                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
+                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
+                        + ", \n newBranches=" + node.canExposeNewBranches()
+                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
+            }
+        } else if (node.isEnabled()) {
+            if (node.getOffset() == -1) {// root node
+                stringRepresentation = (node.hashCode() + "[ color=\"lightblue\" style=\"filled\" label=\"id="
                         + node.getId() + ", Root, #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
                         + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             } else {
-                output.write(node.hashCode() + "[ color=\"green\" style=\"filled\" label=\"" + "id=" + node.getId()
-                        + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
-                        + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode() + ", #choices="
-                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
-                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
-                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
-            }
-        } else if (node.isEnabled()) {
-            if (node.getOffset() == -1) {// root node
-                output.write(node.hashCode() + "[ color=\"lightblue\" style=\"filled\" label=\"id=" + node.getId()
-                        + ", Root, #choices="
-                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
-                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
-                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
-            } else {
-                output.write(node.hashCode() + "[ color=\"red\" label=\"" + "id=" + node.getId() + ", "
+                stringRepresentation = (node.hashCode() + "[ color=\"red\" label=\"" + "id=" + node.getId() + ", "
                         + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
                         + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode() + ", #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
+                        + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             }
         } else {
             if (node.getOffset() == -1) {// root node
-                output.write(node.hashCode() + "[ color=\"lightblue\" style=\"filled\" label=\"id=" + node.getId()
-                        + ", Root, #choices="
+                stringRepresentation = (node.hashCode() + "[ color=\"lightblue\" style=\"filled\" label=\"id="
+                        + node.getId() + ", Root, #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
+                        + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             } else if (node.getType().equals(TrieNodeType.UNSAT_NODE)) {
-                output.write(node.hashCode() + "[ color=\"yellow\" style=\"filled\" label=\"" + "id=" + node.getId()
-                        + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
-                        + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode() + ", #choices="
+                stringRepresentation = (node.hashCode() + "[ color=\"yellow\" style=\"filled\" label=\"" + "id="
+                        + node.getId() + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset="
+                        + node.getOffset() + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode()
+                        + ", #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
+                        + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             } else if (node.getType().equals(TrieNodeType.FRONTIER_NODE)) {
-                output.write(node.hashCode() + "[ color=\"pink\" style=\"filled\" label=\"" + "id=" + node.getId()
-                        + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
-                        + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode() + ", #choices="
+                stringRepresentation = (node.hashCode() + "[ color=\"pink\" style=\"filled\" label=\"" + "id="
+                        + node.getId() + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset="
+                        + node.getOffset() + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode()
+                        + ", #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
+                        + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             } else if (node.getType().equals(TrieNodeType.LEAF_NODE)) {
-                output.write(node.hashCode() + "[ color=\"gray\" style=\"filled\" label=\"" + "id=" + node.getId()
-                        + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
+                stringRepresentation = (node.hashCode() + "[ color=\"gray\" style=\"filled\" label=\"" + "id="
+                        + node.getId() + ", " + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset="
+                        + node.getOffset() + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode()
+                        + ", #choices="
+                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
+                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
+                        + ", \n newBranches=" + node.canExposeNewBranches()
+                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
+            } else {
+                stringRepresentation = (node.hashCode() + "[ label=\"" + "id=" + node.getId() + ", "
+                        + node.getMethodName() + ":" + node.getLineNumber() + ", \n offset=" + node.getOffset()
                         + ", choice=" + node.getChoice() + ", \nbc=" + node.getBytcode() + ", #choices="
                         + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
                         + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
-                        + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
-            } else {
-                output.write(node.hashCode() + "[ label=\"" + "id=" + node.getId() + ", " + node.getMethodName() + ":"
-                        + node.getLineNumber() + ", \n offset=" + node.getOffset() + ", choice=" + node.getChoice()
-                        + ", \nbc=" + node.getBytcode() + ", #choices="
-                        + (node.getMaximumNumberOfChildren() == -1 ? "?" : node.getMaximumNumberOfChildren())
-                        + ", \n score=" + (node.getMetricValue() == null ? "?" : node.getMetricValue())
-                        + ", \n newBranches=" + node.canExposeNewBranches() 
+                        + ", \n newBranches=" + node.canExposeNewBranches()
                         + (printInputSizeInfo ? ", \n inputSize=" + node.getInputSize() + "\"];\n" : "\"];\n"));
             }
         }
-
-        // print its children recursively
-        for (TrieNode child : node.getChildren()) {
-            printTrieNodes(child, output);
-        }
+        return stringRepresentation;
     }
 
-    public void printTrieEdges(TrieNode node, Writer output) throws IOException {
-        // print its children recursively
-        for (TrieNode child : node.getChildren()) {
-            if (child.isEnabled()) {
-                output.write(node.hashCode() + "->" + child.hashCode() + "[ color=\"red\"];\n");
-            } else {
-                output.write(node.hashCode() + "->" + child.hashCode() + ";\n");
+    public void printTrieNodesAndEdges(TrieNode node, Writer output) throws IOException {
+        List<TrieNode> nodesToPrint = new ArrayList<>();
+        nodesToPrint.add(node);
+        while (!nodesToPrint.isEmpty()) {
+            TrieNode currentNode = nodesToPrint.remove(0);
+            
+            /* Print current node. */
+            output.write(generateNodeStringRepresentation(currentNode));
+            
+            /* Print all edges from this node to its children. */
+            List<TrieNode> children = currentNode.getChildren();
+            for (TrieNode child : children) {
+                if (child.isEnabled()) {
+                    output.write(currentNode.hashCode() + "->" + child.hashCode() + "[ color=\"red\"];\n");
+                } else {
+                    output.write(currentNode.hashCode() + "->" + child.hashCode() + ";\n");
+                }
             }
-            printTrieEdges(child, output);
+            
+            /* Add all children the be processed. */
+            nodesToPrint.addAll(children);
         }
-    }
-
-    public static void main(String[] args) {
-        TriePrintToDot tp = new TriePrintToDot();
-        // if(args.length<1){
-        // System.err.println("java TriePrintToDot <trie_name>");
-        // System.exit(1);
-        // }
-
-        String name = "trie_init.dat";
-        if (args.length >= 1) {
-            name = args[0];
-        }
-        tp.loadTrie(name);
-        tp.print(name.replaceAll("dat", "dot"));
     }
 
 }
