@@ -66,7 +66,11 @@ public class BadgerInput {
     public Optional<String> symMinChar;
     public Optional<String> symMaxByte;
     public Optional<String> symMinByte;
-
+    public Optional<String> symMaxDouble;
+    public Optional<String> symMinDouble;
+    public Optional<String> symPrintDebug;
+    public Optional<String> symDefaultValue;
+    
     /* Analysis */
     public TrieAnalyzer trieAnalysisMethod;
     public ExplorationHeuristic explorationHeuristic;
@@ -149,6 +153,10 @@ public class BadgerInput {
         this.symMinChar = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MIN_CHAR.name));
         this.symMaxByte = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MAX_BYTE.name));
         this.symMinByte = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MIN_BYTE.name));
+        this.symMaxDouble = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MAX_DOUBLE.name));
+        this.symMinDouble = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MIN_DOUBLE.name));
+        this.symPrintDebug = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_DEBUG_PRINT.name));
+        this.symDefaultValue = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_DEFAULT_DONT_CARE_VALUE.name));
 
         /* Analysis */
         String analysisMethod = prop.getProperty(BadgerInputKeys.ANALYSIS_METHOD.name, WCAAnalyzer.ID);
@@ -174,7 +182,8 @@ public class BadgerInput {
         case CoverageAnalyzer.ID:
             if (selectedExplorationHeuristic.equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE.ID)) {
                 explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE;
-            } else if (selectedExplorationHeuristic.equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL.ID)) {
+            } else if (selectedExplorationHeuristic
+                    .equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL.ID)) {
                 explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL;
             } else {
                 throw new RuntimeException("Unknown value for " + BadgerInputKeys.ANALYSIS_EXPLORATION_HEURISTIC.name

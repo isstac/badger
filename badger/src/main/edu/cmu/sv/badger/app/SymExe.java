@@ -295,14 +295,6 @@ public class SymExe {
         try {
             Config conf = initSPFConfig();
             conf.setProperty("symbolic.collect_constraints", "false");
-
-            input.symMaxInt.ifPresent(value -> conf.setProperty("symbolic.max_int", value));
-            input.symMinInt.ifPresent(value -> conf.setProperty("symbolic.min_int", value));
-            input.symMaxChar.ifPresent(value -> conf.setProperty("symbolic.max_char", value));
-            input.symMinChar.ifPresent(value -> conf.setProperty("symbolic.min_char", value));
-            input.symMaxByte.ifPresent(value -> conf.setProperty("symbolic.max_byte", value));
-            input.symMinByte.ifPresent(value -> conf.setProperty("symbolic.min_byte", value));
-
             conf.setProperty("target.args", input.jpf_argument.replace("@@", ""));
 
             JPF jpf = new JPF(conf);
@@ -361,13 +353,6 @@ public class SymExe {
             Config conf = initSPFConfig();
             conf.setProperty("symbolic.collect_constraints", "true");
             // conf.setProperty("symbolic.dp", "no_solver"); // symcrete execution, no solver
-            input.symMaxInt.ifPresent(value -> conf.setProperty("symbolic.max_int", value));
-            input.symMinInt.ifPresent(value -> conf.setProperty("symbolic.min_int", value));
-            input.symMaxChar.ifPresent(value -> conf.setProperty("symbolic.max_char", value));
-            input.symMinChar.ifPresent(value -> conf.setProperty("symbolic.min_char", value));
-            input.symMaxByte.ifPresent(value -> conf.setProperty("symbolic.max_byte", value));
-            input.symMinByte.ifPresent(value -> conf.setProperty("symbolic.min_byte", value));
-
             conf.setProperty("target.args", input.jpf_argument.replace("@@", targetArgument));
 
             JPF jpf = new JPF(conf);
@@ -413,6 +398,16 @@ public class SymExe {
         conf.setProperty("symbolic.dp", input.spf_dp);
         conf.setProperty("symbolic.optimizechoices", "false");
         conf.setProperty("symbolic.debug", "false");
+        input.symMaxInt.ifPresent(value -> conf.setProperty("symbolic.max_int", value));
+        input.symMinInt.ifPresent(value -> conf.setProperty("symbolic.min_int", value));
+        input.symMaxChar.ifPresent(value -> conf.setProperty("symbolic.max_char", value));
+        input.symMinChar.ifPresent(value -> conf.setProperty("symbolic.min_char", value));
+        input.symMaxByte.ifPresent(value -> conf.setProperty("symbolic.max_byte", value));
+        input.symMinByte.ifPresent(value -> conf.setProperty("symbolic.min_byte", value));
+        input.symMaxDouble.ifPresent(value -> conf.setProperty("symbolic.max_double", value));
+        input.symMinDouble.ifPresent(value -> conf.setProperty("symbolic.min_double", value));
+        input.symPrintDebug.ifPresent(value -> conf.setProperty("symbolic.debug", value));
+        input.symDefaultValue.ifPresent(value -> conf.setProperty("symbolic.undefined", value));
         return conf;
     }
 

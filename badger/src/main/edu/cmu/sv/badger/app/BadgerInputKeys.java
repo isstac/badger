@@ -38,7 +38,11 @@ public enum BadgerInputKeys {
     SYM_MIN_CHAR                    ("symbolic.min_char",       false),
     SYM_MAX_BYTE                    ("symbolic.max_byte",       false),
     SYM_MIN_BYTE                    ("symbolic.min_byte",       false),
-
+    SYM_MAX_DOUBLE                  ("symbolic.max_double",     false),
+    SYM_MIN_DOUBLE                  ("symbolic.min_double",     false),
+    SYM_DEBUG_PRINT                 ("symbolic.debug",          false),
+    SYM_DEFAULT_DONT_CARE_VALUE     ("symbolic.undefined",      false),
+    
     /* Analysis */
     ANALYSIS_METHOD                 ("analysis.method",         true),
     ANALYSIS_EXPLORATION_HEURISTIC  ("analysis.heuristic",      true),

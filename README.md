@@ -1,3 +1,4 @@
+
 # Badger: Complexity Analysis with Fuzzing and Symbolic Execution
 
 Badger means the combination of fuzzing and symbolic execution for complexity analysis. 
@@ -91,7 +92,9 @@ Badger needs a configuration property file as parameter. The following table sho
 | symbolic.max_char    | Maximum value of symbolic chars. | no |
 | symbolic.min_char    | Minimum value of symbolic chars. | no |
 | symbolic.max_byte    | Maximum value of symbolic bytes. | no |
+| symbolic.debug    | Print SPF debug information (=on to activate). | no |
 | symbolic.min_byte    | Minimum value of symbolic bytes. | no |
+| symbolic.undefined    | SPF default for don't care values (e.g, =0). | no |
 | analysis.method      | Analysis method for trie exploration: "wca" or "cov". | yes |
 | analysis.heuristic   | Trie exploration heuristic. For "wca": "highest-cost-highest-node". "highest-cost-lowest-node", "lowest-cost-highest-node", "lowest-cost-highest-node". For "cov": "branch". | yes |
 | analysis.wca.metric  | Cost metric: "jumps", "instructions", "userdefined" (necessary for "wca"). | no |
