@@ -108,7 +108,7 @@ Badger needs a configuration property file as parameter. The following table sho
 | stat.file.generation | Path to file for generation statistics. Default: "generation-statistic.txt" | no |
 | stat.file.export     | Path to file for export statistics. Default: "export-statistic.txt" | no |
 | stat.file.trie       | Path to file for internal trie statistics. Default: "trie-statistic.txt" | no |
-| stat.print.pc        | Boolean value whether to write files for PathCondition mapping. Default: stat.print | no |
+| stat.print.pc        | Boolean value whether to write files for path condition mapping. Default: "false" | no |
 | stat.file.pc.mapping | Path to file for pc mapping to generated files. Default: "pcMap.txt" | no |
 | trie.print           | Boolean value whether to write dot files for trie graph representation. Default: "false" (High memory consumption for "true"!). | no |
 
