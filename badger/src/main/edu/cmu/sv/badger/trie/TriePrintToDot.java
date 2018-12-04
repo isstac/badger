@@ -45,7 +45,7 @@ public class TriePrintToDot {
         }
     }
 
-    public void print(String fileName) {
+    public void print(String fileName, Integer maxDepth) {
         Writer output = null;
         File file = new File(fileName);
         try {
@@ -58,7 +58,7 @@ public class TriePrintToDot {
         try {
             output.write("digraph \"\" { \n");
             if (null != trie.getRoot()) {
-                printTrieNodesAndEdges(trie.getRoot(), output);
+                printTrieNodesAndEdges(trie.getRoot(), output, maxDepth);
             }
             output.write("}");
         } catch (IOException e) {
@@ -159,7 +159,7 @@ public class TriePrintToDot {
         return stringRepresentation;
     }
 
-    public void printTrieNodesAndEdges(TrieNode node, Writer output) throws IOException {
+    public void printTrieNodesAndEdges(TrieNode node, Writer output, Integer maxDepth) throws IOException {
         List<TrieNode> nodesToPrint = new ArrayList<>();
         nodesToPrint.add(node);
         while (!nodesToPrint.isEmpty()) {
@@ -179,7 +179,9 @@ public class TriePrintToDot {
             }
             
             /* Add all children the be processed. */
-            nodesToPrint.addAll(children);
+            if (maxDepth != null && currentNode.getDepth() < maxDepth) {
+                nodesToPrint.addAll(children);
+            }
         }
     }
 

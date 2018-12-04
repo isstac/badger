@@ -28,6 +28,8 @@ import edu.cmu.sv.badger.io.DynamicCharArrayIOUtils;
 import edu.cmu.sv.badger.io.DynamicIntArrayIOUtils;
 import edu.cmu.sv.badger.io.FullIntArrayIOUtils;
 import edu.cmu.sv.badger.io.IOUtils;
+import edu.cmu.sv.badger.io.ImageByteDoubleIOUtils;
+import edu.cmu.sv.badger.io.ImageDoubleDoubleIOUtils;
 import edu.cmu.sv.badger.io.ImageProcessorIOUtils;
 import edu.cmu.sv.badger.io.IntArrayIOUtils;
 import edu.cmu.sv.badger.io.MultipleIntArrayIOUtils;
@@ -70,6 +72,8 @@ public class BadgerInput {
     public Optional<String> symMinDouble;
     public Optional<String> symPrintDebug;
     public Optional<String> symDefaultValue;
+    public Optional<String> symOptimizeChoices;
+    public Optional<String> symListener;
     
     /* Analysis */
     public TrieAnalyzer trieAnalysisMethod;
@@ -93,6 +97,7 @@ public class BadgerInput {
 
     /* Print Trie As Dot Files */
     public boolean printTrieAsDot;
+    public Optional<Integer> printTrieMaxDepth;
 
     public BadgerInput(Properties prop) {
 
@@ -157,6 +162,8 @@ public class BadgerInput {
         this.symMinDouble = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MIN_DOUBLE.name));
         this.symPrintDebug = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_DEBUG_PRINT.name));
         this.symDefaultValue = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_DEFAULT_DONT_CARE_VALUE.name));
+        this.symOptimizeChoices = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_OPTIMIZECHOICES.name));
+        this.symListener = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_LISTENER.name));
 
         /* Analysis */
         String analysisMethod = prop.getProperty(BadgerInputKeys.ANALYSIS_METHOD.name, WCAAnalyzer.ID);
@@ -174,7 +181,7 @@ public class BadgerInput {
                 explorationHeuristic = WCAExplorationHeuristic.LOWEST_COST_LOWEST_NODE;
             } else {
                 throw new RuntimeException("Unknown value for " + BadgerInputKeys.ANALYSIS_EXPLORATION_HEURISTIC.name
-                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitalble "
+                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitable "
                         + WCAAnalyzer.ID + " heuristic.");
             }
             this.trieAnalysisMethod = new WCAAnalyzer(explorationHeuristic);
@@ -183,11 +190,17 @@ public class BadgerInput {
             if (selectedExplorationHeuristic.equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE.ID)) {
                 explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE;
             } else if (selectedExplorationHeuristic
+                    .equals(CoverageExplorationHeuristic.BRANCH_COV_LOWEST_NODE.ID)) {
+                explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_LOWEST_NODE;
+            } else if (selectedExplorationHeuristic
                     .equals(CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL.ID)) {
                 explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_HIGHEST_NODE_EXPORT_ALL;
+            } else if (selectedExplorationHeuristic
+                    .equals(CoverageExplorationHeuristic.BRANCH_COV_LOWEST_NODE_EXPORT_ALL.ID)) {
+                explorationHeuristic = CoverageExplorationHeuristic.BRANCH_COV_LOWEST_NODE_EXPORT_ALL;
             } else {
                 throw new RuntimeException("Unknown value for " + BadgerInputKeys.ANALYSIS_EXPLORATION_HEURISTIC.name
-                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitalble "
+                        + ": " + selectedExplorationHeuristic + ". Check whether you have selected a suitable "
                         + CoverageAnalyzer.ID + " heuristic.");
             }
             this.trieAnalysisMethod = new CoverageAnalyzer(explorationHeuristic);
@@ -306,6 +319,21 @@ public class BadgerInput {
             }
             this.ioUtils = new DynamicCharArrayIOUtils(inputSizes[0], inputSizes[1]);
             break;
+        case ImageByteDoubleIOUtils.ID:
+            if (inputSizes.length != 3) {
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + ImageByteDoubleIOUtils.ID
+                        + " needs three value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+            }
+            this.ioUtils = new ImageByteDoubleIOUtils(inputSizes[0], inputSizes[1], inputSizes[2]);
+            break;
+        case ImageDoubleDoubleIOUtils.ID:
+            if (inputSizes.length != 3) {
+                throw new RuntimeException(BadgerInputKeys.IO_UTILS.name + "=" + ImageDoubleDoubleIOUtils.ID
+                        + " needs three value definitions for " + BadgerInputKeys.IO_INPUT_SIZES.name);
+            }
+            this.ioUtils = new ImageDoubleDoubleIOUtils(inputSizes[0], inputSizes[1], inputSizes[2]);
+            break;
+            
         default:
             throw new RuntimeException("Unkown value for " + BadgerInputKeys.IO_UTILS.name + ": " + ioUtilsSelection);
         }
@@ -331,6 +359,7 @@ public class BadgerInput {
 
         /* Print Trie As Dot Files */
         this.printTrieAsDot = Boolean.valueOf(prop.getProperty(BadgerInputKeys.PRINT_TRIE.name));
+        this.printTrieMaxDepth = Optional.ofNullable(Integer.parseInt(prop.getProperty(BadgerInputKeys.PRINT_TRIE_MAX_DEPTH.name)));
     }
 
     private List<BadgerInputKeys> checkForMissingMandatoryProperites(Properties prop) {

@@ -90,9 +90,9 @@ public class Trie implements Serializable {
         return false;
     }
 
-    public static void storeTrieAsDot(Trie trie, String filePath) {
+    public static void storeTrieAsDot(Trie trie, String filePath, Integer maxDepth) {
         TriePrintToDot tp = new TriePrintToDot(trie);
-        tp.print(filePath);
+        tp.print(filePath, maxDepth);
     }
 
     public static Trie loadTrie(String filePath) {

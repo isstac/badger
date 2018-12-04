@@ -121,7 +121,7 @@ public class SymExe {
             TrieNode identifiedNode = input.trieAnalysisMethod.analyze(trie);
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-analyzed.dot");
+                Trie.storeTrieAsDot(trie, "trie-analyzed.dot", input.printTrieMaxDepth.get());
             }
 
             // Break the loop if no new node was identified.
@@ -130,13 +130,13 @@ public class SymExe {
             }
 
             // Replay trie for enabled nodes and extract path conditions for new explored nodes.
-            runJPF(trie, input.numberOfAdditionalDecisions, identifiedNode.getInputSize());
+            runJPFReplayAndBSE(trie, input.numberOfAdditionalDecisions, identifiedNode.getInputSize());
 
             Statistics.appendTrieStatistics(input, trie.getStatistics(), pcAndSolutionQueue.size(),
                     alreadyReadInputFiles.size());
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-explored.dot");
+                Trie.storeTrieAsDot(trie, "trie-explored.dot", input.printTrieMaxDepth.get());
             }
 
             // Generate input.
@@ -149,7 +149,7 @@ public class SymExe {
             }
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-extended.dot");
+                Trie.storeTrieAsDot(trie, "trie-extended.dot", input.printTrieMaxDepth.get());
             }
 
             Statistics.appendTrieStatistics(input, trie.getStatistics(), pcAndSolutionQueue.size(),
@@ -212,7 +212,7 @@ public class SymExe {
         return newInputFiles;
     }
 
-    private Pair<Double, Boolean> runJPF(String targetArgument, String originalFileName, Trie trie,
+    private Pair<Double, Boolean> runJPFSymCrete(String targetArgument, String originalFileName, Trie trie,
             ConcreteSPFMode spfMode) {
 
         if (targetArgument == null) {
@@ -223,8 +223,16 @@ public class SymExe {
 
         try {
             Config conf = initSPFConfig();
+
+            /*
+             * Collect constraints = true, i.e. choice generators will only have ONE choice, exactly as the concrete
+             * input determines
+             */
             conf.setProperty("symbolic.collect_constraints", "true");
+
+            /* Disable solving because we only follow one path, which is determined by the concrete input. */
             conf.setProperty("symbolic.dp", "no_solver"); // symcrete execution, no solver
+
             conf.setProperty("target.args", input.jpf_argument.replace("@@", targetArgument));
 
             JPF jpf = new JPF(conf);
@@ -290,12 +298,21 @@ public class SymExe {
         return null;
     }
 
-    private void runJPF(Trie trie, int additionalDecisions, int inputSize) {
+    private void runJPFReplayAndBSE(Trie trie, int additionalDecisions, int inputSize) {
         TrieGuidanceListener trieBuilderListener = null;
         try {
             Config conf = initSPFConfig();
+
+            /*
+             * Here we don not want to use symcrete execution, instead we will start with guided trie execution and
+             * alter to proper bounded symbolic execution. The switching betweeen replay and BSE is implemented in the
+             * listener below.
+             */
             conf.setProperty("symbolic.collect_constraints", "false");
             conf.setProperty("target.args", input.jpf_argument.replace("@@", ""));
+            
+            /* We only have additional listener for the real JPF runs. */
+            input.symListener.ifPresent(value -> conf.setProperty("listener", value));
 
             JPF jpf = new JPF(conf);
 
@@ -340,8 +357,8 @@ public class SymExe {
 
     }
 
-    private Pair<Pair<PathCondition, Map<String, Object>>, Double> runJPF(String targetArgument,
-            String originalFileName, ConcreteSPFMode spfMode) {
+    private Pair<Pair<PathCondition, Map<String, Object>>, Double> runJPF_NoTrieModificationButOptimize(
+            String targetArgument, String originalFileName, ConcreteSPFMode spfMode) {
 
         if (targetArgument == null) {
             return null;
@@ -351,8 +368,21 @@ public class SymExe {
 
         try {
             Config conf = initSPFConfig();
+
+            /*
+             * Collect constraints = true, i.e. choice generators will only have ONE choice, exactly as the concrete
+             * input determines
+             */
             conf.setProperty("symbolic.collect_constraints", "true");
-            // conf.setProperty("symbolic.dp", "no_solver"); // symcrete execution, no solver
+
+            /*
+             * Here we do *not* want to disable solving because we want to optimize the cost for the current input. We
+             * need this optimization because the user-defined cost might depend on symbolic values which are not
+             * represented in decisions, hence, we first want to make sure that we use an input that really provides the
+             * maximum user-defined cost before adding this input to the trie.
+             */
+            // conf.setProperty("symbolic.dp", "no_solver");
+
             conf.setProperty("target.args", input.jpf_argument.replace("@@", targetArgument));
 
             JPF jpf = new JPF(conf);
@@ -396,8 +426,6 @@ public class SymExe {
         conf.setProperty("jvm.insn_factory.class", "gov.nasa.jpf.symbc.SymbolicInstructionFactory");
         conf.setProperty("vm.storage.class", "nil");
         conf.setProperty("symbolic.dp", input.spf_dp);
-        conf.setProperty("symbolic.optimizechoices", "false");
-        conf.setProperty("symbolic.debug", "false");
         input.symMaxInt.ifPresent(value -> conf.setProperty("symbolic.max_int", value));
         input.symMinInt.ifPresent(value -> conf.setProperty("symbolic.min_int", value));
         input.symMaxChar.ifPresent(value -> conf.setProperty("symbolic.max_char", value));
@@ -408,6 +436,7 @@ public class SymExe {
         input.symMinDouble.ifPresent(value -> conf.setProperty("symbolic.min_double", value));
         input.symPrintDebug.ifPresent(value -> conf.setProperty("symbolic.debug", value));
         input.symDefaultValue.ifPresent(value -> conf.setProperty("symbolic.undefined", value));
+        input.symOptimizeChoices.ifPresent(value -> conf.setProperty("symbolic.optimizechoices", value));
         return conf;
     }
 
@@ -422,7 +451,7 @@ public class SymExe {
                 if (input.spf_dp.endsWith("optimize") && input.useUserDefinedCost) {
 
                     // Make a dry (without changing anything from the trie).
-                    Pair<Pair<PathCondition, Map<String, Object>>, Double> resultOriginalInput = runJPF(
+                    Pair<Pair<PathCondition, Map<String, Object>>, Double> resultOriginalInput = runJPF_NoTrieModificationButOptimize(
                             processedFileName, originalFileName, spfMode);
                     Pair<PathCondition, Map<String, Object>> observedPcAndSolution = resultOriginalInput._1;
                     Double observedCostOriginalInput = resultOriginalInput._2;
@@ -444,8 +473,8 @@ public class SymExe {
                     String processedMaximizedInputFile = processedVersionOfMaximizedInputFile.get(maximizedInputFile);
 
                     // Perform real run with trie.
-                    Pair<Double, Boolean> resultMaximizedInput = runJPF(processedMaximizedInputFile, maximizedInputFile,
-                            this.trie, spfMode);
+                    Pair<Double, Boolean> resultMaximizedInput = runJPFSymCrete(processedMaximizedInputFile,
+                            maximizedInputFile, this.trie, spfMode);
                     Double observedCostMaximizedInput = resultMaximizedInput._1;
                     Boolean maximizedCostTriggeredNewHighscore = resultMaximizedInput._2;
 
@@ -468,7 +497,7 @@ public class SymExe {
                     }
                 } else {
                     // If we do not maximize any terms, then this represents the normal run.
-                    runJPF(processedFileName, originalFileName, this.trie, spfMode);
+                    runJPFSymCrete(processedFileName, originalFileName, this.trie, spfMode);
                 }
 
             }

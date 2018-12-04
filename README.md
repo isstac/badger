@@ -97,6 +97,8 @@ Badger needs a configuration property file as parameter. The following table sho
 | symbolic.min_double    | Minimum value of symbolic doubles. | no |
 | symbolic.debug    | Print SPF debug information (=on to activate). | no |
 | symbolic.undefined    | SPF default for don't care values (e.g, =0). | no |
+| symbolic.optimizechoices | SPF flag to use internal optimization. | no |
+| listener | Additional listeners to add during bounded symbolic execution phase. | no |
 | analysis.method      | Analysis method for trie exploration: "wca" or "cov". | yes |
 | analysis.heuristic   | Trie exploration heuristic. For "wca": "highest-cost-highest-node". "highest-cost-lowest-node", "lowest-cost-highest-node", "lowest-cost-highest-node". For "cov": "branch". | yes |
 | analysis.wca.metric  | Cost metric: "jumps", "instructions", "userdefined" (necessary for "wca"). | no |
@@ -111,6 +113,7 @@ Badger needs a configuration property file as parameter. The following table sho
 | stat.print.pc        | Boolean value whether to write files for path condition mapping. Default: "false" | no |
 | stat.file.pc.mapping | Path to file for pc mapping to generated files. Default: "pcMap.txt" | no |
 | trie.print           | Boolean value whether to write dot files for trie graph representation. Default: "false" (High memory consumption for "true"!). | no |
+|trie.print.maxdepth | Node depth, up to which the trie will be printed as dot file. Limiting this might help for debugging. | no | 
 
 ### Example: Insertion Sort
 

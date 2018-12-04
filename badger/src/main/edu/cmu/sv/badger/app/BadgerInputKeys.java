@@ -42,13 +42,14 @@ public enum BadgerInputKeys {
     SYM_MIN_DOUBLE                  ("symbolic.min_double",     false),
     SYM_DEBUG_PRINT                 ("symbolic.debug",          false),
     SYM_DEFAULT_DONT_CARE_VALUE     ("symbolic.undefined",      false),
+    SYM_OPTIMIZECHOICES             ("symbolic.optimizechoices",false),
+    SYM_LISTENER                    ("listener",                false),
     
     /* Analysis */
     ANALYSIS_METHOD                 ("analysis.method",         true),
     ANALYSIS_EXPLORATION_HEURISTIC  ("analysis.heuristic",      true),
     ANALYSIS_WCA_METRIC             ("analysis.wca.metric",     false),
     ANALYSIS_COV_METRIC             ("analysis.cov.metric",     false),
-    
 
     /* Input Processing / Generation */
     IO_UTILS                        ("io.utils",                true),
@@ -65,7 +66,8 @@ public enum BadgerInputKeys {
     PC_MAPPING_FILE                 ("stat.file.pc.mapping",    false),
 
     /* Print Trie As Dot Files */
-    PRINT_TRIE                      ("trie.print",              false);
+    PRINT_TRIE                      ("trie.print",              false),
+    PRINT_TRIE_MAX_DEPTH            ("trie.print.maxdepth",     false);
     
     public String name;
     public boolean isMandatory;
