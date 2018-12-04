@@ -1,9 +1,9 @@
 /badger/tmp/
 /badger/build/
 /badger/pcMap.txt
-/badger/import-statistic.txt
-/badger/generation-statistic.txt
-/badger/export-statistic.txt
-/badger/trie-statistic.txt
+/badger/import-statistics.txt
+/badger/generation-statistics.txt
+/badger/export-statistics.txt
+/badger/trie-statistics.txt
 *.dot
 *.pdf
