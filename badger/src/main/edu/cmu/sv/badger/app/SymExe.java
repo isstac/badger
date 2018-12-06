@@ -121,7 +121,7 @@ public class SymExe {
             TrieNode identifiedNode = input.trieAnalysisMethod.analyze(trie);
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-analyzed.dot", input.printTrieMaxDepth.get());
+                Trie.storeTrieAsDot(trie, "trie-analyzed.dot", input.printTrieMaxDepth.orElse(null));
             }
 
             // Break the loop if no new node was identified.
@@ -136,7 +136,7 @@ public class SymExe {
                     alreadyReadInputFiles.size());
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-explored.dot", input.printTrieMaxDepth.get());
+                Trie.storeTrieAsDot(trie, "trie-explored.dot", input.printTrieMaxDepth.orElse(null));
             }
 
             // Generate input.
@@ -149,7 +149,7 @@ public class SymExe {
             }
 
             if (input.printTrieAsDot) {
-                Trie.storeTrieAsDot(trie, "trie-extended.dot", input.printTrieMaxDepth.get());
+                Trie.storeTrieAsDot(trie, "trie-extended.dot", input.printTrieMaxDepth.orElse(null));
             }
 
             Statistics.appendTrieStatistics(input, trie.getStatistics(), pcAndSolutionQueue.size(),
