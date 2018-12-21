@@ -1,3 +1,4 @@
 /kelinci_analysis/bin
 /kelinci_analysis/bin-instr
 /spf_analysis/bin
+/kelinci_analysis/fuzzer-out
