@@ -1,31 +1,21 @@
-inputDir=/vol/home-vol2/se/nollerya/fuzzing/01_engagement1_image_processor/kelincispf/kelinci_analysis/fuzzer-out/afl/queue
-exportDir=/vol/home-vol2/se/nollerya/fuzzing/01_engagement1_image_processor/kelincispf/kelinci_analysis/fuzzer-out/spf/queue
-tmpDir=./tmp
+dir.initial.input=/Users/yannic/repositories/isstac/badger/evaluation/06_image_processor/kelinci_analysis/in_dir
+dir.sync.input=/Users/yannic/repositories/isstac/badger/evaluation/06_image_processor/kelinci_analysis/fuzzer-out/afl/queue
+dir.export=/Users/yannic/repositories/isstac/badger/evaluation/06_image_processor/kelinci_analysis/fuzzer-out/spf/queue
 
-classpath=/vol/home-vol2/se/nollerya/fuzzing/01_engagement1_image_processor/kelincispf/spf_analysis/bin
-#target=drivers.ByteImageDriver
-target=drivers.FullImageDriver
+jpf.classpath=/Users/yannic/repositories/isstac/badger/evaluation/06_image_processor/spf_analysis/bin
+#jpf.target=drivers.ByteImageDriver
+jpf.target=drivers.FullImageDriver
 symbolic.method=com.stac.image.algorithms.filters.Intensify.filter(con)
 symbolic.dp=z3bitvector
 
-cycleWaitingSec=600
-secUntilFirstCycle=0
+symexe.wait.sec=600
+symexe.iterations=10
 
 analysis.method=wca
 analysis.wca.metric=jumps
-analysis.wca.selection.heuristic=highest-score-highest-node
+analysis.heuristic=highest-cost-highest-node
 
 #io.utils=byte-image
 io.utils=image
-
-numberOfAdditionalDecisions=0
-maximumNumberOfNodesExploredPerRun=1
-initialId=0
-
-import.statistics.file=import-statistics.txt
-generation.statistics.file=generation-statistics.txt
-export.statistics.file=export-statistics.txt
-pc.mapping.file=pcMap.txt
-trie.statistics.file=trie-statistics.txt
-
-debug.print=false
+io.input.sizes=2 2
+#not used by io utils in this case
