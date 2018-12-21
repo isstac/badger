@@ -25,7 +25,8 @@ USERDEFINED_COLUMN_ID=4
 
 #interfaceCmd="/Users/yannic/Downloads/interface_cost_log"
 #interfaceCmd="/Users/yannic/Downloads/kelinciwca/fuzzerside/interface_cost_log"
-interfaceCmd="/Users/yannic/Downloads/kelinciwca/fuzzerside/interface_cost_log_latest"
+#interfaceCmd="/Users/yannic/Downloads/kelinciwca/fuzzerside/interface_cost_log_latest"
+interfaceCmd="/Users/yannic/repositories/isstac/kelinci/fuzzerside/interface_cost_log_latest"
 #interfaceCmd="/vol/home-vol2/se/nollerya/fuzzing/kelinciwca/fuzzerside/interface_cost_log"
 
 if __name__ == '__main__':
@@ -39,7 +40,7 @@ if __name__ == '__main__':
     for i in range(1, NUMBER_OF_EXPERIMENTS+1):
 
         # Get start time.
-        statFilePath = srcDir + str(i) + "/import-statistics.txt"
+        statFilePath = srcDir + str(i) + "/import-statistic.txt"
         with open(statFilePath, 'r') as statFile:
             statFile.readline()
             secondLine = statFile.readline()
@@ -58,7 +59,7 @@ if __name__ == '__main__':
 
         # Generate Cost Info
         collected_times = []
-        exportFile = srcDir + str(i) + "/export-statistics.txt"
+        exportFile = srcDir + str(i) + "/export-statistic.txt"
         with open(exportFile,'r') as csvfile:
             csvreader = csv.reader(csvfile)
             timeBucket = STEP_SIZE
@@ -68,7 +69,8 @@ if __name__ == '__main__':
             for row in csvreader:
                 currentTime = int(row[UNIX_TIME_COLUMN_ID]) - startTime
                 currentFile = row[FILE_COLUMN_ID]
-                currentFilePath = srcDir + str(i) + currentFile[1:]
+                #currentFilePath = srcDir + str(i) + currentFile[1:]
+                currentFilePath = "/" + currentFile[1:]
                 call([interfaceCmd, currentFilePath, costFilePath])
                 collected_times.append(currentTime)
 
