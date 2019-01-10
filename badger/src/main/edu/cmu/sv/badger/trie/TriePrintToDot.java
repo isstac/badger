@@ -179,7 +179,7 @@ public class TriePrintToDot {
             }
             
             /* Add all children the be processed. */
-            if (maxDepth != null && currentNode.getDepth() < maxDepth) {
+            if (maxDepth == null || currentNode.getDepth() < maxDepth) {
                 nodesToPrint.addAll(children);
             }
         }
