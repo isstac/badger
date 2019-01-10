@@ -359,7 +359,7 @@ public class BadgerInput {
 
         /* Print Trie As Dot Files */
         this.printTrieAsDot = Boolean.valueOf(prop.getProperty(BadgerInputKeys.PRINT_TRIE.name));
-        this.printTrieMaxDepth = Optional.ofNullable(Integer.valueOf(prop.getProperty(BadgerInputKeys.PRINT_TRIE_MAX_DEPTH.name)));
+        this.printTrieMaxDepth = Optional.ofNullable(NumberUtils.createInteger(prop.getProperty(BadgerInputKeys.PRINT_TRIE_MAX_DEPTH.name)));
     }
 
     private List<BadgerInputKeys> checkForMissingMandatoryProperites(Properties prop) {
