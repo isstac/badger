@@ -48,7 +48,7 @@ Normally we use the following folder structure to analyze an applicaton:
 |   +-- fuzzer-out
 |   |   +-- afl/queue
 |   |   +-- symexe/queue
-+-- symexe_analysis
++-- spf_analysis
 |   +-- src
 |   +-- bin
 ```
