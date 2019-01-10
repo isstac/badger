@@ -422,10 +422,10 @@ public class SymExe {
         Config conf = JPF.createConfig(new String[0]);
         conf.setProperty("classpath", input.jpf_classpath);
         conf.setProperty("target", input.jpf_targetClass);
-        conf.setProperty("symbolic.method", input.spf_symbolicMethod);
         conf.setProperty("jvm.insn_factory.class", "gov.nasa.jpf.symbc.SymbolicInstructionFactory");
         conf.setProperty("vm.storage.class", "nil");
         conf.setProperty("symbolic.dp", input.spf_dp);
+        input.spf_symbolicMethod.ifPresent(value -> conf.setProperty("symbolic.method", value));
         input.symMaxInt.ifPresent(value -> conf.setProperty("symbolic.max_int", value));
         input.symMinInt.ifPresent(value -> conf.setProperty("symbolic.min_int", value));
         input.symMaxChar.ifPresent(value -> conf.setProperty("symbolic.max_char", value));

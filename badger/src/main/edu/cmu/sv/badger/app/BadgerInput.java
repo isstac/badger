@@ -60,7 +60,7 @@ public class BadgerInput {
     public String jpf_argument;
 
     /* SPF */
-    public String spf_symbolicMethod;
+    public Optional<String> spf_symbolicMethod;
     public String spf_dp;
     public Optional<String> symMaxInt;
     public Optional<String> symMinInt;
@@ -150,7 +150,7 @@ public class BadgerInput {
         this.jpf_argument = jpf_argument.replaceAll(" ", ",");
 
         /* SPF */
-        this.spf_symbolicMethod = prop.getProperty(BadgerInputKeys.SYMBOLIC_METHOD.name);
+        this.spf_symbolicMethod = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYMBOLIC_METHOD.name));
         this.spf_dp = prop.getProperty(BadgerInputKeys.DECISION_PRCEDURE.name, "z3");
         this.symMaxInt = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MAX_INT.name));
         this.symMinInt = Optional.ofNullable(prop.getProperty(BadgerInputKeys.SYM_MIN_INT.name));

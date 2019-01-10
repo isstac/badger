@@ -85,7 +85,7 @@ Badger needs a configuration property file as parameter. The following table sho
 | jpf.classpath        | Path to the application binaries. | yes |
 | jpf.target           | Qualified name of the Java class (driver) that contains the main method for the analysis. | yes |
 | jpf.argument         | Values of the arguments for the driver, separated by spaces. Default: "@@". | no |
-| symbolic.method      | Qualified name of the method(s), which should be contained in the symbolic analysis. Definition similar to SPF. | yes |
+| symbolic.method      | Qualified name of the method(s), which should be contained in the symbolic analysis. Definition similar to SPF. | no |
 | symbolic.dp          | Decision Procedure for constraint solving. Default: "z3". | no |
 | symbolic.max_int     | Maximum value of symbolic integers. | no |
 | symbolic.min_int     | Minimum value of symbolic integers. | no |

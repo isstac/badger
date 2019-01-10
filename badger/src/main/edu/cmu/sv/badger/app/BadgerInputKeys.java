@@ -30,7 +30,7 @@ public enum BadgerInputKeys {
     APPLICATION_ARGUMENT            ("jpf.argument",            false),
     
     /* SPF */
-    SYMBOLIC_METHOD                 ("symbolic.method",         true),
+    SYMBOLIC_METHOD                 ("symbolic.method",         false),
     DECISION_PRCEDURE               ("symbolic.dp",             false),
     SYM_MAX_INT                     ("symbolic.max_int",        false),
     SYM_MIN_INT                     ("symbolic.min_int",        false),
